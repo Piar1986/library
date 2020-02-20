@@ -29,7 +29,7 @@ url_page_template = 'http://tululu.org/l55/{}'
 url_book_template = 'http://tululu.org/b{}/'
 url_download_txt_template = 'http://tululu.org/txt.php?id={}'
 
-parser = argparse.ArgumentParser()
+parser = argparse.ArgumentParser(description='Парсер книг с сайта tululu.org')
 parser.add_argument('--start_page', help='Начальная страница', type=int)
 parser.add_argument('--end_page', help='Конечная страница', type=int, default=702)
 args = parser.parse_args()
