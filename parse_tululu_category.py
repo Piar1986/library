@@ -9,9 +9,6 @@ from pathvalidate import sanitize_filename
 from urllib.parse import urljoin
 from pprint import pprint
 
-Path('books').mkdir(parents=True, exist_ok=True)
-Path('images').mkdir(parents=True, exist_ok=True)
-
 url_page_template = 'http://tululu.org/l55/{}'
 #url_book_template = 'http://tululu.org/b{}/'
 url_download_txt_template = 'http://tululu.org/txt.php?id={}'
@@ -25,7 +22,6 @@ def download_txt(url, filename, folder='books'):
 			file.write(response.text)
 		return filepath
 	
-
 def download_image(url, filename, folder='images'):
 	response = requests.get(url, allow_redirects = False)
 	response.raise_for_status()
@@ -35,10 +31,15 @@ def download_image(url, filename, folder='images'):
 			file.write(response.content)
 		return filepath	
 
+Path('books').mkdir(parents=True, exist_ok=True)
+Path('images').mkdir(parents=True, exist_ok=True)
+
+start_page = 700
+end_page = 701
 books_data = []
 
-for n in range(1,2):
-	url = url_page_template.format(n)
+for page in range(start_page, end_page):
+	url = url_page_template.format(page)
 	response = requests.get(url)
 	response.raise_for_status()
 	soup = BeautifulSoup(response.text, 'lxml')
@@ -56,7 +57,9 @@ for n in range(1,2):
 		book_information = book_title_text.split('::')
 		book_title = book_information[0].strip()
 		book_author = book_information[1].strip()
-		
+
+		print(book_title)
+
 		comments = [comment.text for comment in soup.select(".texts span")]
 		genres = [genre.text for genre in soup.select("span.d_book a")]
 		
@@ -65,9 +68,9 @@ for n in range(1,2):
 		book_path = download_txt(book_txt_url, book_title)
 
 		book_image_src = book.find('img')['src']
-		image_title = book_image_src.split('/')[2]
+		book_image_title = book_image_src.split('/')[2]
 		book_image_url = urljoin('http://tululu.org/more', book_image_src)
-		img_src = download_image(book_image_url, image_title)
+		img_src = download_image(book_image_url, book_image_title)
 
 		book_data = {
 				"title": book_title,
