@@ -25,9 +25,8 @@ def download_image(url, filename, folder='images'):
 			file.write(response.content)
 		return filepath
 
-url_page_template = 'http://tululu.org/l55/{}'
-url_book_template = 'http://tululu.org/b{}/'
-url_download_txt_template = 'http://tululu.org/txt.php?id={}'
+page_url_template = 'http://tululu.org/l55/more'
+book_download_url_template = 'http://tululu.org/txt.php?id={}'
 
 parser = argparse.ArgumentParser(description='Парсер книг с сайта tululu.org')
 parser.add_argument('--start_page', help='Начальная страница', type=int)
@@ -40,8 +39,8 @@ if args.start_page:
 
 	books_data = []
 	for page in range(args.start_page, args.end_page):
-		url = url_page_template.format(page)
-		response = requests.get(url)
+		page_url = urljoin(page_url_template, str(page))
+		response = requests.get(page_url)
 		response.raise_for_status()
 		soup = BeautifulSoup(response.text, 'lxml')
 		books_from_page = soup.select(".bookimage")
@@ -63,8 +62,9 @@ if args.start_page:
 			genres = [genre.text for genre in soup.select("span.d_book a")]
 
 			book_id = book_page_href.strip('/b')
-			book_txt_url = url_download_txt_template.format(book_id)
-			book_path = download_txt(book_txt_url, book_title)
+
+			book_download_url = book_download_url_template.format(book_id)
+			book_path = download_txt(book_download_url, book_title)
 
 			if book_path is not None:
 				book_image_src = book.select_one("img")['src']
@@ -82,7 +82,7 @@ if args.start_page:
 				}
 				books_data.append(book_data)
 
-				print(url_book_template.format(book_id))
+				print(book_page_url)
 
 	with open("books_data.json", "w", encoding='utf8') as my_file:
 		json.dump(books_data, my_file, ensure_ascii = False, indent=4)
