@@ -49,7 +49,7 @@ if __name__ == '__main__':
 
             for book in books_from_page:
                 book_page_href = book.select_one('a')['href']
-                book_page_url = urljoin('http://tululu.org/more', book_page_href)    
+                book_page_url = urljoin('http://tululu.org', book_page_href.strip('/') + '/')
 
                 response = requests.get(book_page_url, allow_redirects = False)
                 response.raise_for_status()
@@ -71,7 +71,7 @@ if __name__ == '__main__':
                 if book_path is not None:
                     book_image_src = book.select_one('img')['src']
                     book_image_title = book_image_src.split('/')[2]
-                    book_image_url = urljoin('http://tululu.org/more', book_image_src)
+                    book_image_url = urljoin('http://tululu.org', book_image_src.strip('/'))
                     img_src = download_image(book_image_url, book_image_title)    
 
                     book_data = {
